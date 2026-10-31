@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="随机工具箱">
-<meta name="app-version" content="1.2.0">
+<meta name="app-version" content="1.3.1">
 <title>随机工具箱</title>
 <style>
 :root{--hd:#f3edf7;--bg:#fffbfe;--tx:#1d1b20;--mu:#6f6a78;--ac:#6750a4;--ol:#79747e;--fb:#eaddff;--fbt:#21005d;--sh:#f3edf7;--cd:#ece6f0;--th:#fff;--ok:#16a34a;--wn:#d97706}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--hd:#2b2930;--bg:#1d1b20;--tx:#e6e0e9;--mu:#a49fae;--ac:#d0bcff;--ol:#938f99;--fb:#d0bcff;--fbt:#381e72;--sh:#2b2930;--cd:#2b2930;--th:#381e72;--ok:#4ade80;--wn:#fbbf24}}
-:root[data-theme="dark"]{--hd:#2b2930;--bg:#1d1b20;--tx:#e6e0e9;--mu:#a49fae;--ac:#d0bcff;--ol:#938f99;--fb:#d0bcff;--fbt:#381e72;--sh:#2b2930;--cd:#2b2930;--th:#381e72;--ok:#4ade80;--wn:#fbbf24}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--hd:#27282b;--bg:#151619;--tx:#e6e0e9;--mu:#a49fae;--ac:#d0bcff;--ol:#938f99;--fb:#d0bcff;--fbt:#381e72;--sh:#26272b;--cd:#212225;--th:#381e72;--ok:#4ade80;--wn:#fbbf24}}
+:root[data-theme="dark"]{--hd:#27282b;--bg:#151619;--tx:#e6e0e9;--mu:#a49fae;--ac:#d0bcff;--ol:#938f99;--fb:#d0bcff;--fbt:#381e72;--sh:#26272b;--cd:#212225;--th:#381e72;--ok:#4ade80;--wn:#fbbf24}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;margin:0}
 body{background:var(--hd);color:var(--tx);font:16px/1.5 -apple-system,"PingFang SC","Hiragino Sans","Noto Sans SC",sans-serif;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);overflow:hidden;position:fixed;inset:0}
@@ -44,7 +44,8 @@ small.ok{color:var(--ok)}small.wn{color:var(--wn)}
 .tg input::after{content:"";position:absolute;top:6px;left:6px;width:16px;height:16px;border-radius:50%;background:var(--ol);transition:.2s}
 .tg input:checked{background:var(--ac);border-color:var(--ac)}
 .tg input:checked::after{left:24px;top:2px;width:24px;height:24px;background:var(--th)}
-.bx{border:1px solid var(--ol);border-radius:16px;padding:6px 16px;min-width:170px}
+.bx{border:1px solid var(--ol);border-radius:16px;padding:6px 16px;min-width:170px;transition:opacity .2s}
+.bx.hid{visibility:hidden;opacity:0}
 .pk{position:absolute;left:26px;top:24px;width:56px;height:102px;z-index:2;overflow:hidden}
 .ps{height:100%;overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none;overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch}
 .ps::-webkit-scrollbar{display:none}
@@ -89,9 +90,19 @@ small.ok{color:var(--ok)}small.wn{color:var(--wn)}
 .tb:focus-within{border-color:var(--ac);box-shadow:0 0 0 1px var(--ac)}
 .tb textarea{width:100%;height:43px;border:0;background:linear-gradient(to bottom,transparent 43px,#8885 43px) 0 0/100% 44px local;color:var(--tx);font-size:16px;line-height:44px;font-family:inherit;padding:0 16px;white-space:pre;overflow-x:auto;overflow-y:hidden;resize:none;outline:none;display:block}
 .mo{position:fixed;inset:0;z-index:5}
-.mn{position:absolute;right:20px;top:78px;z-index:6;background:var(--sh);border-radius:12px;padding:6px 0;box-shadow:0 6px 20px #0006;min-width:180px}
-.mn button{display:block;width:100%;text-align:left;border:0;background:none;color:var(--tx);font-size:15px;padding:11px 18px}
+.mn{position:absolute;right:20px;top:76px;z-index:6;background:var(--sh);border-radius:16px;padding:6px 0;box-shadow:0 8px 24px #0007;width:204px;animation:mnp .15s;transform-origin:100% 0}
+@keyframes mnp{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
+.mn button{display:flex;align-items:center;gap:16px;width:100%;height:50px;text-align:left;border:0;background:none;color:var(--tx);font-size:15px;padding:0 18px}
 .mn button:active{background:#8884}
+.mn hr{border:0;border-top:1px solid #8886;margin:6px 16px}
+.mic{width:24px;height:24px;display:flex;align-items:center;justify-content:center;color:var(--mu);flex:none}
+.mic .bx2{width:20px;height:20px;border:2px solid var(--mu);border-radius:4px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;line-height:1}
+.mic .bx2.on{background:var(--ac);border-color:var(--ac);color:var(--th)}
+.pl{max-height:46vh;overflow:auto;margin:14px 0 20px;text-align:left}
+.pr{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #8884}
+.pr span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pr input{width:74px;border:1px solid var(--ol);background:none;color:var(--tx);border-radius:10px;padding:8px;font-size:16px;text-align:center}
+.pr b{width:56px;text-align:right;color:var(--ac);font-weight:500;font-size:14px}
 #ov{position:fixed;inset:0;background:#0007;opacity:0;pointer-events:none;transition:opacity .25s;z-index:20}
 #ov.on{opacity:1;pointer-events:auto}
 #sh{position:fixed;left:50%;bottom:0;width:100%;max-width:560px;transform:translate(-50%,105%);transition:transform .3s cubic-bezier(.2,.8,.2,1);background:var(--sh);border-radius:28px 28px 0 0;padding:10px 20px calc(24px + env(safe-area-inset-bottom,0px));z-index:21;text-align:center}
@@ -126,12 +137,13 @@ h2{font-size:14px;color:var(--ac);margin:20px 4px 0;font-weight:600}
 <nav class="tabs" id="tabs"></nav>
 <div class="pane" id="pane"></div>
 <button class="fab" id="fab"><svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.96 7.96 0 0 0 12 4a8 8 0 1 0 7.73 10h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg><span id="fl">生成</span></button>
+<input type="file" id="fi" accept=".txt,.csv,.json,text/plain,application/json" hidden>
 <div id="ov"></div><div id="sh"></div><div id="toast"></div>
 <script>
 (function(){
 var TABS=[["num","数字"],["list","列表"],["dice","骰子"],["coin","硬币"],["card","纸牌"],["color","颜色"]];
 var LBL={num:"生成",list:"生成",dice:"掷骰",card:"抽牌",color:"生成"};
-var P={ref:"M17.65 6.35A7.96 7.96 0 0 0 12 4a8 8 0 1 0 7.73 10h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z",
+var P={edit:"M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z",pie:"M11 2v20c-5.07-.5-9-4.79-9-10s3.93-9.5 9-10zm2.03 0v8.99H22c-.47-4.74-4.24-8.52-8.97-8.99zm0 11.01V22c4.74-.47 8.5-4.25 8.97-8.99h-8.97z",dl:"M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z",ref:"M17.65 6.35A7.96 7.96 0 0 0 12 4a8 8 0 1 0 7.73 10h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z",
  chk:"M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z",cp:"M16 1H4a2 2 0 0 0-2 2v14h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z",
  plus:"M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z",del:"M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z",
  more:"M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm0 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z",
@@ -180,6 +192,10 @@ async function ints(n,min,max,repl){
   src={t:"lo",m:""};return local(n,min,max,repl)}
 function updSt(){var e=$("#st");if(e){e.textContent=src.t=="ok"?"✓ 真随机":src.t=="wn"?"⚠ 本地随机":"";e.className=src.t}if(src.t=="wn")toast(src.m)}
 
+function nrShow(){var b=$("#nrb");if(b)b.classList.toggle("hid",K.num<2)}
+function baseColor(){var h=getComputedStyle(document.documentElement).getPropertyValue("--bg").trim(),m=h.match(/^#([0-9a-f]{6})$/i);if(!m)return;
+  $("#hx").textContent="#"+m[1].toUpperCase();$("#rg").textContent=[0,2,4].map(function(i){return parseInt(m[1].substr(i,2),16)}).join(", ")}
+function mi(id,i,t){return '<button id="'+id+'"><span class="mic">'+i+"</span>"+t+"</button>"}
 function grow(t){t.style.height=Math.max(1,t.value.split("\n").length)*44-1+"px"}
 function actList(){return L.items.filter(function(l){return l.id==L.act})[0]||L.items[0]}
 function parse(t){return t.split("\n").map(function(s){return s.trim()}).filter(Boolean).map(function(s){
@@ -207,7 +223,7 @@ function pkR(key,max){
   e.innerHTML=h+'</div></div><div class="pb"></div>';
   var ps=$("#ps"),its=ps.querySelectorAll(".pi");ps.scrollTop=(K[key]-1)*34;
   ps.onscroll=function(){var n=Math.min(max,Math.max(1,Math.round(ps.scrollTop/34)+1));
-    if(n!=K[key]){K[key]=n;for(var j=0;j<its.length;j++)its[j].classList.toggle("cu",j+1==n);if(key=="dice")diceShow();vib()}};
+    if(n!=K[key]){K[key]=n;for(var j=0;j<its.length;j++)its[j].classList.toggle("cu",j+1==n);if(key=="dice")diceShow();if(key=="num")nrShow();vib()}};
   ps.onclick=function(ev){var t=ev.target;if(t.className.indexOf("pi")>=0)ps.scrollTo({top:(+t.textContent-1)*34,behavior:"smooth"})}}
 function die(n){var m={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]}[n],h="";
   for(var i=0;i<9;i++)h+='<i'+(m.indexOf(i)>=0?' class="on'+(n==1?" r":"")+'"':"")+'></i>';return '<div class="dc">'+h+'</div>'}
@@ -231,10 +247,13 @@ function setColor(v){colorV=v;var hex="#"+v.map(function(x){return("0"+x.toStrin
 /* 页面 */
 function render(){
   frame();var p=$("#pane"),h="";p.className="pane"+(cur=="coin"?" grid":"");p.style.background="";p.style.color="";p.scrollTop=0;
-  if(cur=="num")h='<div class="pk" id="pk"></div><div class="stage"><div class="big" id="out">?</div><div class="fl"><div class="of"><input id="mn" type="number" inputmode="numeric" placeholder=" " value="1"><label>最小值</label></div><div class="of"><input id="mx" type="number" inputmode="numeric" placeholder=" " value="100"><label>最大值</label></div></div><div class="bx"><label class="tg"><span>不重复</span><input id="nr" type="checkbox"></label></div></div>';
+  if(cur=="num")h='<div class="pk" id="pk"></div><div class="stage"><div class="big" id="out">?</div><div class="fl"><div class="of"><input id="mn" type="number" inputmode="numeric" placeholder=" " value="1"><label>最小值</label></div><div class="of"><input id="mx" type="number" inputmode="numeric" placeholder=" " value="100"><label>最大值</label></div></div><div class="bx hid" id="nrb"><label class="tg"><span>不重复</span><input id="nr" type="checkbox"></label></div></div>';
   if(cur=="list"){var a=actList();
     h='<div class="lb"><div class="sel"><select id="sel">'+L.items.map(function(l){return '<option value="'+l.id+'"'+(l.id==a.id?" selected":"")+'>'+esc(l.name)+'</option>'}).join("")+'</select></div><span class="vd"></span><button class="ib" id="ad" aria-label="新建列表">'+ic(P.plus)+'</button><button class="ib" id="dl" aria-label="删除列表">'+ic(P.del)+'</button><button class="ib" id="mr" aria-label="更多">'+ic(P.more)+'</button></div>'
-    +(menu?'<div class="mo" id="mo"></div><div class="mn"><button id="m1">重命名</button><button id="m2">清空列表</button><button id="m3">结果数量：'+L.cnt+'</button><button id="m4">不放回：'+(L.nr?"开":"关")+'</button><button id="m5">概率权重说明</button></div>':"")
+    +(menu?'<div class="mo" id="mo"></div><div class="mn">'
+      +mi("m1",ic(P.edit),"重命名列表")+mi("m2",ic(P.pie),"设置概率")+"<hr>"
+      +mi("m3",'<span class="bx2">'+L.cnt+'</span>',"结果数量")+mi("m4",'<span class="bx2'+(L.nr?' on">✓':'">')+'</span>',"不放回")+"<hr>"
+      +mi("m5",ic(P.plus),"导入文件")+mi("m6",ic(P.dl),"导出此列表")+mi("m7",ic(P.dl),"导出所有列表")+'</div>':"")
     +'<div class="tb"><textarea id="ls" wrap="off" spellcheck="false" placeholder="每行一项，回车以添加新项">'+esc(a.text)+'</textarea></div><div style="height:110px;flex:none"></div>'}
   if(cur=="dice")h='<div class="pk" id="pk"></div><div class="stage"><div class="dr" id="dr"></div><div class="sum" id="sm"></div></div>';
   if(cur=="coin")h='<div class="stage cs" id="cs"><div class="cl" id="cl">向上滑动以翻转</div><div class="cn" id="cn">正</div></div>';
@@ -246,9 +265,9 @@ function render(){
   p.innerHTML=h;bind();
 }
 function bind(){
-  if(cur=="num"){pkR("num",50);$("#out").onclick=function(){copy(this.getAttribute("data-c"))}}
+  if(cur=="num"){pkR("num",50);nrShow();$("#out").onclick=function(){copy(this.getAttribute("data-c"))}}
   if(cur=="dice"){pkR("dice",12);diceShow()}
-  if(cur=="color"){setColor(colorV||local(3,0,255,true));$("#hx").onclick=function(){copy(this.textContent)}}
+  if(cur=="color"){if(colorV)setColor(colorV);else baseColor();$("#hx").onclick=function(){copy(this.textContent)}}
   if(cur=="list"){
     $("#sel").onchange=function(){L.act=+this.value;sv("rt-lists",L);render()};
     grow($("#ls"));
@@ -258,10 +277,12 @@ function bind(){
     $("#mr").onclick=function(){menu=true;render()};
     if(menu){var cl=function(){menu=false;render()};$("#mo").onclick=cl;
       $("#m1").onclick=function(){var a=actList(),n=prompt("重命名列表",a.name);menu=false;if(n!==null){n=n.trim();if(!n)toast("列表名称不能为空");else{a.name=n;sv("rt-lists",L)}}render()};
-      $("#m2").onclick=function(){menu=false;if(confirm("确定清空当前列表？")){actList().text="";sv("rt-lists",L)}render()};
+      $("#m2").onclick=function(){menu=false;render();openProb()};
       $("#m3").onclick=function(){var n=prompt("结果数量",L.cnt);menu=false;if(n!==null){n=Math.floor(+n);if(n>=1&&n<=500){L.cnt=n;sv("rt-lists",L)}else toast("请输入 1–500 的整数")}render()};
       $("#m4").onclick=function(){L.nr=!L.nr;menu=false;sv("rt-lists",L);render()};
-      $("#m5").onclick=function(){alert("在项目末尾加 #数字 可设置被抽到的概率，例如：\n一等奖#1\n二等奖#3\n数字越大越容易被抽到；不加则默认为 #1。")}}
+      $("#m5").onclick=function(){menu=false;render();$("#fi").click()};
+      $("#m6").onclick=function(){var a=actList();menu=false;render();if(!a.text.trim())return toast("当前列表是空的");dl(fname(a.name)+".txt",a.text)};
+      $("#m7").onclick=function(){menu=false;render();dl("random-toolbox-lists.json",JSON.stringify({app:"random-toolbox",v:1,lists:L.items.map(function(l){return{name:l.name,text:l.text}})},null,2),"application/json")}}
   }
   if(cur=="coin"){var y0=null,c=$("#cs");
     c.addEventListener("touchstart",function(e){y0=e.touches[0].clientY},{passive:true});
@@ -290,7 +311,7 @@ function bind(){
 
 /* 生成 */
 async function runNum(){
-  var a=Math.floor(parseFloat($("#mn").value)),b=Math.floor(parseFloat($("#mx").value)),ct=K.num,nr=$("#nr").checked,o=$("#out");
+  var a=Math.floor(parseFloat($("#mn").value)),b=Math.floor(parseFloat($("#mx").value)),ct=K.num,nr=ct>1&&$("#nr").checked,o=$("#out");
   if(isNaN(a)||isNaN(b))return toast("请输入最小值和最大值");
   if(b<=a)return toast("最大值应大于最小值");
   if(Math.abs(a)>1e9||Math.abs(b)>1e9)return toast("数值过大");
@@ -307,6 +328,28 @@ async function listPick(){
   if(L.nr&&ct>items.length){toast("项目数量（"+items.length+"）不能小于结果数量（"+ct+"）");return null}
   var rs=await ints(ct,0,999999999,true),o=pick(items,ct,L.nr,rs);addH("列表 · "+a.name,o.join(", "));return o}
 function sbHtml(o){return o.map(function(x){return "<div>"+esc(x)+"</div>"}).join("")}
+function dl(name,text,type){var b=new Blob([text],{type:type||"text/plain;charset=utf-8"}),u=URL.createObjectURL(b),a=document.createElement("a");
+  a.href=u;a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){a.remove();URL.revokeObjectURL(u)},1500);toast("已导出："+name)}
+function fname(n){return n.replace(/[\\/:*?"<>|]/g,"_")||"列表"}
+function importText(name,t){
+  var obj=null;if(/\.json$/i.test(name)||/^\s*[\[{]/.test(t)){try{obj=JSON.parse(t)}catch(e){}}
+  var ls=obj&&(Array.isArray(obj)?obj:obj.lists);
+  if(ls&&ls.length){var n=0;ls.forEach(function(x){if(x&&x.name&&typeof x.text=="string"){var id=Date.now()+n;L.items.push({id:id,name:String(x.name),text:x.text});L.act=id;n++}});
+    if(n){sv("rt-lists",L);render();toast("已导入 "+n+" 个列表")}else toast("文件里没有可导入的列表");return}
+  var text=t.replace(/\r\n?/g,"\n").split("\n").map(function(x){return x.trim()}).filter(Boolean).join("\n");
+  if(!text)return toast("文件内容为空");
+  var nm=name.replace(/\.[^.]*$/,"")||"导入的列表",id=Date.now();L.items.push({id:id,name:nm,text:text});L.act=id;sv("rt-lists",L);render();
+  toast("已导入 "+text.split("\n").length+" 项到“"+nm+"”")}
+function openProb(){
+  var a=actList(),it=parse(a.text);if(!it.length)return toast("请先添加项目");
+  $("#sh").innerHTML='<div class="gr"></div><div class="sl">设置概率（数值越大，越容易被抽到）</div><div class="pl" id="pl">'+it.map(function(x,i){return '<div class="pr"><span>'+esc(x.n)+'</span><input type="number" inputmode="decimal" min="0" step="any" value="'+x.w+'" data-i="'+i+'"><b></b></div>'}).join("")+'</div><div class="sa"><button class="ob" id="pc">取消</button><button class="fb2" id="pv" style="flex:1.3;font-size:15px;font-weight:600">保存</button></div>';
+  var ins=$("#pl").querySelectorAll("input"),bs=$("#pl").querySelectorAll("b");
+  function upd(){var v=[].map.call(ins,function(x){return Math.max(0,parseFloat(x.value)||0)}),t=v.reduce(function(a,b){return a+b},0);v.forEach(function(x,i){bs[i].textContent=t>0?Math.round(x/t*1000)/10+"%":"–"})}
+  [].forEach.call(ins,function(x){x.oninput=upd});upd();
+  $("#ov").className="on";$("#sh").className="on";$("#ov").onclick=closeSheet;$("#pc").onclick=closeSheet;
+  $("#pv").onclick=function(){var v=[].map.call(ins,function(x){return parseFloat(x.value)});
+    if(v.some(function(x){return !(x>0)}))return toast("每项的数值必须大于 0");
+    a.text=it.map(function(x,i){return v[i]==1?x.n:x.n+"#"+v[i]}).join("\n");sv("rt-lists",L);closeSheet();render();toast("已保存")}}
 function closeSheet(){$("#ov").className="";$("#sh").className=""}
 function openSheet(o){
   $("#sh").innerHTML='<div class="gr"></div><div class="sl">随机项目</div><div class="sb" id="sb">'+sbHtml(o)+'</div><div class="sa"><button class="ob" id="cp">'+ic(P.cp)+'复制</button><button class="fb2" id="rr" aria-label="重新抽取">'+ic(P.ref)+'</button><button class="ob" id="dn">'+ic(P.chk)+'完成</button></div>';
@@ -336,6 +379,8 @@ async function go(){
   if(busy||!RUN[cur])return;busy=true;var f=$("#fab");f.classList.add("sp");vib();
   try{await RUN[cur]();updSt()}finally{busy=false;setTimeout(function(){f.classList.remove("sp")},600)}}
 $("#fab").onclick=go;
+$("#fi").onchange=function(){var f=this.files[0];this.value="";if(!f)return;if(f.size>2e6)return toast("文件过大（超过 2 MB）");
+  var r=new FileReader();r.onload=function(){importText(f.name,String(r.result).replace(/^\uFEFF/,""))};r.onerror=function(){toast("读取文件失败")};r.readAsText(f)};
 async function chk(){
   try{var r=await fetch(location.href.split("#")[0],{cache:"reload"});if(!r.ok)throw new Error("HTTP "+r.status);
     var m=(await r.text()).match(/name="app-version" content="([^"]+)"/);if(!m)return{s:"unk"};
