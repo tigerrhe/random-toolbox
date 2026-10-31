@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="随机工具箱">
+<meta name="app-version" content="1.2.0">
 <title>随机工具箱</title>
 <style>
 :root{--hd:#f3edf7;--bg:#fffbfe;--tx:#1d1b20;--mu:#6f6a78;--ac:#6750a4;--ol:#79747e;--fb:#eaddff;--fbt:#21005d;--sh:#f3edf7;--cd:#ece6f0;--th:#fff;--ok:#16a34a;--wn:#d97706}
@@ -44,9 +45,13 @@ small.ok{color:var(--ok)}small.wn{color:var(--wn)}
 .tg input:checked{background:var(--ac);border-color:var(--ac)}
 .tg input:checked::after{left:24px;top:2px;width:24px;height:24px;background:var(--th)}
 .bx{border:1px solid var(--ol);border-radius:16px;padding:6px 16px;min-width:170px}
-.pk{position:absolute;left:26px;top:30px;width:56px;text-align:center;z-index:2}
-.pk b{display:block;font-weight:400;font-size:15px;padding:7px 0;color:var(--mu);opacity:.6;cursor:pointer}
-.pk .cu{font-size:20px;color:var(--tx);opacity:1;border-top:1px solid var(--ol);border-bottom:1px solid var(--ol);cursor:default}
+.pk{position:absolute;left:26px;top:24px;width:56px;height:102px;z-index:2;overflow:hidden}
+.ps{height:100%;overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none;overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch}
+.ps::-webkit-scrollbar{display:none}
+.pw{padding:34px 0}
+.pi{height:34px;display:flex;align-items:center;justify-content:center;scroll-snap-align:center;color:var(--mu);font-size:15px;opacity:.55;cursor:pointer;user-select:none;-webkit-user-select:none}
+.pi.cu{color:var(--tx);font-size:21px;opacity:1}
+.pb{position:absolute;left:0;right:0;top:34px;height:34px;border-top:1px solid var(--ol);border-bottom:1px solid var(--ol);pointer-events:none}
 .fab{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);height:56px;padding:0 24px 0 18px;border:0;border-radius:18px;background:var(--fb);color:var(--fbt);display:flex;align-items:center;gap:12px;font-size:15px;font-weight:600;box-shadow:0 3px 10px #0005;z-index:10;transition:transform .15s,box-shadow .15s;white-space:nowrap}
 .fab:active{transform:translateX(-50%) scale(.94);box-shadow:0 1px 4px #0005}
 .fab.sp svg{animation:sp .6s}
@@ -80,8 +85,9 @@ small.ok{color:var(--ok)}small.wn{color:var(--wn)}
 .sel::after{content:"▾";position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--mu);pointer-events:none}
 .vd{width:1px;height:28px;background:var(--ol);opacity:.6}
 .lb .ib{width:46px;height:52px;border-radius:0}
-.tb{flex:1;margin:12px 20px 0;border:1px solid var(--ol);border-radius:14px;overflow:hidden;min-height:200px}
-.tb textarea{width:100%;height:100%;border:0;background:linear-gradient(to bottom,transparent 43px,#8885 43px) 0 0/100% 44px local;color:var(--tx);font:16px/44px inherit;font-family:inherit;padding:0 16px 100px;resize:none;outline:none;display:block}
+.tb{flex:none;margin:12px 20px 0;border:1px solid var(--ol);border-radius:14px;overflow:hidden}
+.tb:focus-within{border-color:var(--ac);box-shadow:0 0 0 1px var(--ac)}
+.tb textarea{width:100%;height:43px;border:0;background:linear-gradient(to bottom,transparent 43px,#8885 43px) 0 0/100% 44px local;color:var(--tx);font-size:16px;line-height:44px;font-family:inherit;padding:0 16px;white-space:pre;overflow-x:auto;overflow-y:hidden;resize:none;outline:none;display:block}
 .mo{position:fixed;inset:0;z-index:5}
 .mn{position:absolute;right:20px;top:78px;z-index:6;background:var(--sh);border-radius:12px;padding:6px 0;box-shadow:0 6px 20px #0006;min-width:180px}
 .mn button{display:block;width:100%;text-align:left;border:0;background:none;color:var(--tx);font-size:15px;padding:11px 18px}
@@ -138,10 +144,12 @@ function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 var $=function(s){return document.querySelector(s)};
 var sleep=function(ms){return new Promise(function(r){setTimeout(r,ms)})};
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+var VER=document.querySelector('meta[name="app-version"]').content;
 var cur="num",prev="num",busy=false,menu=false,src={t:"lo",m:""},colorV=null,lastCard=null;
 var cfg=Object.assign({key:"",on:true,anim:true,vib:true,theme:"auto"},ld("rt-cfg",{}));
-var L=Object.assign({items:[{id:1,name:"列表 1",text:"一等奖#1\n二等奖#3\n三等奖#6"}],act:1,cnt:1,nr:false},ld("rt-lists",{}));
+var L=Object.assign({items:[{id:1,name:"列表 1",text:""}],act:1,cnt:1,nr:false},ld("rt-lists",{}));
 if(!L.items||!L.items.length)L.items=[{id:1,name:"列表 1",text:""}];
+L.items.forEach(function(l){if(l.text==="一等奖#1\n二等奖#3\n三等奖#6")l.text=""});
 var K={num:1,dice:1},hist=ld("rt-hist",[]);
 function useTrue(){return !!(cfg.on&&cfg.key)}
 function toast(m){var t=$("#toast");t.textContent=m;t.className="on";clearTimeout(toast.t);toast.t=setTimeout(function(){t.className=""},1800)}
@@ -172,6 +180,7 @@ async function ints(n,min,max,repl){
   src={t:"lo",m:""};return local(n,min,max,repl)}
 function updSt(){var e=$("#st");if(e){e.textContent=src.t=="ok"?"✓ 真随机":src.t=="wn"?"⚠ 本地随机":"";e.className=src.t}if(src.t=="wn")toast(src.m)}
 
+function grow(t){t.style.height=Math.max(1,t.value.split("\n").length)*44-1+"px"}
 function actList(){return L.items.filter(function(l){return l.id==L.act})[0]||L.items[0]}
 function parse(t){return t.split("\n").map(function(s){return s.trim()}).filter(Boolean).map(function(s){
   var m=s.match(/^(.*)#(\d+(?:\.\d+)?)$/);return m&&m[1].trim()?{n:m[1].trim(),w:parseFloat(m[2])}:{n:s,w:1}})}
@@ -192,8 +201,14 @@ function frame(){
   if(sub)$("#bk").onclick=function(){cur=prev;render()};
   else{$("#bh").onclick=function(){prev=cur;cur="hist";render()};$("#bs").onclick=function(){prev=cur;cur="set";render()}}
 }
-function pkR(key,max){var n=K[key],h="";if(n>1)h+='<b data-d="-1">'+(n-1)+'</b>';h+='<b class="cu">'+n+'</b>';if(n<max)h+='<b data-d="1">'+(n+1)+'</b>';
-  var e=$("#pk");e.innerHTML=h;e.onclick=function(ev){var d=ev.target.getAttribute("data-d");if(d){K[key]=Math.min(max,Math.max(1,n+ +d));pkR(key,max);if(key=="dice")diceShow()}}}
+function pkR(key,max){
+  var e=$("#pk"),h='<div class="ps" id="ps"><div class="pw">';
+  for(var i=1;i<=max;i++)h+='<div class="pi'+(i==K[key]?" cu":"")+'">'+i+'</div>';
+  e.innerHTML=h+'</div></div><div class="pb"></div>';
+  var ps=$("#ps"),its=ps.querySelectorAll(".pi");ps.scrollTop=(K[key]-1)*34;
+  ps.onscroll=function(){var n=Math.min(max,Math.max(1,Math.round(ps.scrollTop/34)+1));
+    if(n!=K[key]){K[key]=n;for(var j=0;j<its.length;j++)its[j].classList.toggle("cu",j+1==n);if(key=="dice")diceShow();vib()}};
+  ps.onclick=function(ev){var t=ev.target;if(t.className.indexOf("pi")>=0)ps.scrollTo({top:(+t.textContent-1)*34,behavior:"smooth"})}}
 function die(n){var m={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]}[n],h="";
   for(var i=0;i<9;i++)h+='<i'+(m.indexOf(i)>=0?' class="on'+(n==1?" r":"")+'"':"")+'></i>';return '<div class="dc">'+h+'</div>'}
 function diceShow(v){v=v||Array.apply(null,Array(K.dice)).map(function(){return 1});$("#dr").innerHTML=v.map(die).join("");
@@ -219,15 +234,15 @@ function render(){
   if(cur=="num")h='<div class="pk" id="pk"></div><div class="stage"><div class="big" id="out">?</div><div class="fl"><div class="of"><input id="mn" type="number" inputmode="numeric" placeholder=" " value="1"><label>最小值</label></div><div class="of"><input id="mx" type="number" inputmode="numeric" placeholder=" " value="100"><label>最大值</label></div></div><div class="bx"><label class="tg"><span>不重复</span><input id="nr" type="checkbox"></label></div></div>';
   if(cur=="list"){var a=actList();
     h='<div class="lb"><div class="sel"><select id="sel">'+L.items.map(function(l){return '<option value="'+l.id+'"'+(l.id==a.id?" selected":"")+'>'+esc(l.name)+'</option>'}).join("")+'</select></div><span class="vd"></span><button class="ib" id="ad" aria-label="新建列表">'+ic(P.plus)+'</button><button class="ib" id="dl" aria-label="删除列表">'+ic(P.del)+'</button><button class="ib" id="mr" aria-label="更多">'+ic(P.more)+'</button></div>'
-    +(menu?'<div class="mo" id="mo"></div><div class="mn"><button id="m1">重命名</button><button id="m2">清空列表</button><button id="m3">结果数量：'+L.cnt+'</button><button id="m4">不放回：'+(L.nr?"开":"关")+'</button></div>':"")
-    +'<div class="tb"><textarea id="ls" spellcheck="false" placeholder="每行一项，末尾加 #数字 可设置被抽到的概率权重">'+esc(a.text)+'</textarea></div>'}
+    +(menu?'<div class="mo" id="mo"></div><div class="mn"><button id="m1">重命名</button><button id="m2">清空列表</button><button id="m3">结果数量：'+L.cnt+'</button><button id="m4">不放回：'+(L.nr?"开":"关")+'</button><button id="m5">概率权重说明</button></div>':"")
+    +'<div class="tb"><textarea id="ls" wrap="off" spellcheck="false" placeholder="每行一项，回车以添加新项">'+esc(a.text)+'</textarea></div><div style="height:110px;flex:none"></div>'}
   if(cur=="dice")h='<div class="pk" id="pk"></div><div class="stage"><div class="dr" id="dr"></div><div class="sum" id="sm"></div></div>';
   if(cur=="coin")h='<div class="stage cs" id="cs"><div class="cl" id="cl">向上滑动以翻转</div><div class="cn" id="cn">正</div></div>';
   if(cur=="card")h='<div class="stage"><div class="cl" id="cl" style="color:inherit">抽一张牌</div><div id="cc"><div class="pcd bk"></div></div><div class="bx"><label class="tg"><span>JQK</span><input id="jq" type="checkbox" checked></label><label class="tg"><span>小丑</span><input id="jk" type="checkbox" checked></label></div></div>';
   if(cur=="color")h='<div class="stage"><div class="big" id="hx" style="color:inherit;font-size:40px"></div><div id="rg" style="opacity:.7;font-size:18px"></div></div>';
   if(cur=="hist")h='<div class="pg"><div class="card">'+(hist.length?hist.map(function(x){return '<div class="hi"><span>'+esc(x.t)+'<br><small>'+esc(x.at)+'</small></span><span>'+esc(x.r)+'</span></div>'}).join("")+'<button class="btn o" id="clr">清空历史记录</button>':'<div class="note" style="text-align:center">无历史记录</div>')+'</div></div>';
   if(cur=="set")h='<div class="pg"><h2>外观与反馈</h2><div class="card"><label class="t">主题背景</label><div class="seg" id="th">'+[["auto","默认"],["light","浅色"],["dark","深色"]].map(function(t){return '<button data-v="'+t[0]+'" class="'+(cfg.theme==t[0]?"on":"")+'">'+t[1]+'</button>'}).join("")+'</div><label class="tg" style="margin-top:8px"><span>启用动画</span><input id="an" type="checkbox"'+(cfg.anim?" checked":"")+'></label><label class="tg"><span>启用振动</span><input id="vb" type="checkbox"'+(cfg.vib?" checked":"")+'></label><p class="note">iPhone 的 Safari 不支持网页振动，该选项在安卓浏览器上有效。</p></div>'
-   +'<h2>真随机数（random.org）</h2><div class="card"><label class="t">API key</label><input id="key" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="粘贴你的 key" value="'+esc(cfg.key)+'"><label class="tg" style="margin-top:6px"><span>显示 key</span><input id="shw" type="checkbox"></label><label class="tg"><span>使用真随机</span><input id="on" type="checkbox"'+(cfg.on?" checked":"")+'></label><button class="btn" id="sav">保存</button><button class="btn o" id="tst">测试连接</button><div class="note" id="tr" style="text-align:center;min-height:22px"></div><p class="note">key 只保存在这台设备的浏览器里，不会上传。没填 key、关闭开关或请求失败时自动使用本地随机。真随机数由 Random.org 提供。</p></div></div>';
+   +'<h2>真随机数（random.org）</h2><div class="card"><label class="t">API key</label><input id="key" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="粘贴你的 key" value="'+esc(cfg.key)+'"><label class="tg" style="margin-top:6px"><span>显示 key</span><input id="shw" type="checkbox"></label><label class="tg"><span>使用真随机</span><input id="on" type="checkbox"'+(cfg.on?" checked":"")+'></label><button class="btn" id="sav">保存</button><button class="btn o" id="tst">测试连接</button><div class="note" id="tr" style="text-align:center;min-height:22px"></div><p class="note">key 只保存在这台设备的浏览器里，不会上传。没填 key、关闭开关或请求失败时自动使用本地随机。真随机数由 Random.org 提供。</p></div><h2>关于</h2><div class="card"><div class="tg" style="padding-top:0;cursor:default"><span>当前版本</span><span style="color:var(--mu)">'+VER+'</span></div><button class="btn" id="upd">检查更新</button><div class="note" id="us" style="text-align:center;min-height:22px"></div><p class="note">页面有时会被浏览器缓存而没有自动更新，点“检查更新”会向服务器重新获取最新版。</p></div></div>';
   p.innerHTML=h;bind();
 }
 function bind(){
@@ -236,7 +251,8 @@ function bind(){
   if(cur=="color"){setColor(colorV||local(3,0,255,true));$("#hx").onclick=function(){copy(this.textContent)}}
   if(cur=="list"){
     $("#sel").onchange=function(){L.act=+this.value;sv("rt-lists",L);render()};
-    $("#ls").oninput=function(){actList().text=this.value;sv("rt-lists",L)};
+    grow($("#ls"));
+    $("#ls").oninput=function(){actList().text=this.value;sv("rt-lists",L);grow(this)};
     $("#ad").onclick=function(){var n=prompt("新列表名称","列表 "+(L.items.length+1));if(n===null)return;n=n.trim();if(!n)return toast("列表名称不能为空");var id=Date.now();L.items.push({id:id,name:n,text:""});L.act=id;sv("rt-lists",L);render()};
     $("#dl").onclick=function(){if(L.items.length<2)return toast("至少保留一个列表");var a=actList();if(!confirm("确定删除列表“"+a.name+"”？"))return;L.items=L.items.filter(function(l){return l.id!=a.id});L.act=L.items[0].id;sv("rt-lists",L);render()};
     $("#mr").onclick=function(){menu=true;render()};
@@ -244,7 +260,8 @@ function bind(){
       $("#m1").onclick=function(){var a=actList(),n=prompt("重命名列表",a.name);menu=false;if(n!==null){n=n.trim();if(!n)toast("列表名称不能为空");else{a.name=n;sv("rt-lists",L)}}render()};
       $("#m2").onclick=function(){menu=false;if(confirm("确定清空当前列表？")){actList().text="";sv("rt-lists",L)}render()};
       $("#m3").onclick=function(){var n=prompt("结果数量",L.cnt);menu=false;if(n!==null){n=Math.floor(+n);if(n>=1&&n<=500){L.cnt=n;sv("rt-lists",L)}else toast("请输入 1–500 的整数")}render()};
-      $("#m4").onclick=function(){L.nr=!L.nr;menu=false;sv("rt-lists",L);render()}}
+      $("#m4").onclick=function(){L.nr=!L.nr;menu=false;sv("rt-lists",L);render()};
+      $("#m5").onclick=function(){alert("在项目末尾加 #数字 可设置被抽到的概率，例如：\n一等奖#1\n二等奖#3\n数字越大越容易被抽到；不加则默认为 #1。")}}
   }
   if(cur=="coin"){var y0=null,c=$("#cs");
     c.addEventListener("touchstart",function(e){y0=e.touches[0].clientY},{passive:true});
@@ -261,7 +278,13 @@ function bind(){
     $("#tst").onclick=async function(){keep();var t=$("#tr");
       if(!cfg.key){t.textContent="请先填写 key";return}if(!cfg.on){t.textContent="请先打开“使用真随机”";return}
       this.disabled=true;t.textContent="连接中…";await ints(1,1,6,true);
-      t.textContent=src.t=="ok"?"✓ 真随机 · random.org 连接成功":"⚠ "+src.m;this.disabled=false}
+      t.textContent=src.t=="ok"?"✓ 真随机 · random.org 连接成功":"⚠ "+src.m;this.disabled=false};
+    $("#upd").onclick=async function(){var b=this,u=$("#us");if(b.getAttribute("data-new")){location.reload();return}
+      b.disabled=true;u.textContent="检查中…";var r=await chk();b.disabled=false;
+      if(r.s=="new"){u.textContent="发现新版本 "+r.v;b.textContent="立即更新";b.setAttribute("data-new","1")}
+      else if(r.s=="ok")u.textContent="已是最新版本";
+      else if(r.s=="unk")u.textContent="无法判断版本，请稍后再试";
+      else u.textContent="检查失败（"+r.m+"）。需要联网，并通过网址打开页面。"}
   }
 }
 
@@ -313,7 +336,13 @@ async function go(){
   if(busy||!RUN[cur])return;busy=true;var f=$("#fab");f.classList.add("sp");vib();
   try{await RUN[cur]();updSt()}finally{busy=false;setTimeout(function(){f.classList.remove("sp")},600)}}
 $("#fab").onclick=go;
+async function chk(){
+  try{var r=await fetch(location.href.split("#")[0],{cache:"reload"});if(!r.ok)throw new Error("HTTP "+r.status);
+    var m=(await r.text()).match(/name="app-version" content="([^"]+)"/);if(!m)return{s:"unk"};
+    return{s:m[1]!==VER?"new":"ok",v:m[1]}}
+  catch(e){return{s:"err",m:e&&e.message||"网络错误"}}}
 theme();render();
+if(/^https?:/.test(location.protocol))setTimeout(async function(){var r=await chk();if(r.s=="new")toast("发现新版本 "+r.v+"，可在 设置 → 检查更新 中更新")},2000);
 })();
 </script>
 </body>
