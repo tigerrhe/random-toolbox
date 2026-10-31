@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="随机工具箱">
+<title>随机工具箱</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--tx:#1b1d21;--mu:#6b7280;--ac:#3b6ef5;--bd:#e3e6eb;--ac-tx:#fff;--ok:#16a34a;--wn:#d97706;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15171b;--card:#1f2228;--tx:#eceef2;--mu:#9aa1ad;--ac:#6f94ff;--bd:#2e323a;--ac-tx:#0e1116;--ok:#4ade80;--wn:#fbbf24}}
+:root[data-theme="dark"]{--bg:#15171b;--card:#1f2228;--tx:#eceef2;--mu:#9aa1ad;--ac:#6f94ff;--bd:#2e323a;--ac-tx:#0e1116;--ok:#4ade80;--wn:#fbbf24}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 -apple-system,"PingFang SC","Hiragino Sans","Noto Sans SC",sans-serif}
+main{max-width:520px;margin:0 auto;padding:16px}
+h1{font-size:20px;margin:4px 0 12px}
+nav{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px}
+nav button{flex:none;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:999px;padding:7px 14px;font-size:15px}
+nav button.on{background:var(--ac);color:var(--ac-tx);border-color:var(--ac)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-top:10px}
+label{display:block;font-size:14px;color:var(--mu);margin:10px 0 4px}
+input[type=number],input[type=text],input[type=password],textarea{width:100%;border:1px solid var(--bd);background:var(--bg);color:var(--tx);border-radius:10px;padding:9px 10px;font-size:16px}
+textarea{min-height:110px;resize:vertical}
+.row{display:flex;gap:10px}.row>*{flex:1}
+.chk{display:flex;align-items:center;gap:8px;margin-top:12px;color:var(--tx);font-size:15px}
+.go{width:100%;margin-top:14px;border:0;background:var(--ac);color:var(--ac-tx);border-radius:12px;padding:12px;font-size:17px;font-weight:600}
+.go:disabled{opacity:.6}
+.go.sec{background:transparent;color:var(--ac);border:1px solid var(--ac)}
+.res{margin-top:14px;min-height:60px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;font-size:22px}
+.chip{background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:6px 12px;font-weight:600}
+.coin{width:84px;height:84px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;background:var(--ac);color:var(--ac-tx);animation:fl .5s}
+@keyframes fl{from{transform:rotateY(540deg) scale(.6)}to{transform:none}}
+.die{width:60px;height:60px;border-radius:12px;background:var(--card);border:2px solid var(--ac);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700}
+.pc{width:56px;height:80px;border-radius:8px;background:#fff;border:1px solid var(--bd);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#222}
+.pc.r{color:#d33}
+.sum{width:100%;text-align:center;color:var(--mu);font-size:14px}
+.src{width:100%;text-align:center;font-size:13px;color:var(--mu)}
+.src.ok{color:var(--ok)}.src.wn{color:var(--wn)}
+.hi{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd);font-size:14px}
+.hi span:last-child{color:var(--mu);text-align:right;word-break:break-all}
+.err{color:#d33;font-size:14px;text-align:center}
+.note{font-size:13px;color:var(--mu);margin:8px 0 0}
+small{color:var(--mu)}
+.badge{display:inline-block;font-size:12px;border-radius:999px;padding:1px 8px;border:1px solid var(--bd);color:var(--mu);margin-left:6px;vertical-align:middle}
+.badge.on{color:var(--ok);border-color:var(--ok)}
+</style>
+</head>
+<body>
+<main>
+<h1>🎲 随机工具箱<span class="badge" id="bdg"></span></h1>
+<nav id="nav"></nav>
+<div id="view"></div>
+</main>
+<script>
+(function(){
+var TABS=[["num","数字"],["list","列表"],["coin","硬币"],["dice","骰子"],["card","纸牌"],["hist","历史"],["set","设置"]];
+var cur="num",hist=[],cfg={key:"",on:true},src="",busy=false;
+function ld(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
+function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+hist=ld("rt-hist",[]);cfg=ld("rt-cfg",cfg);
+var $=function(s){return document.querySelector(s)};
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function chips(a){return a.map(function(x){return '<span class="chip">'+esc(x)+'</span>'}).join("")}
+function useTrue(){return !!(cfg.on&&cfg.key)}
+function badge(){var b=$("#bdg");b.textContent=useTrue()?"真随机":"本地随机";b.className="badge"+(useTrue()?" on":"")}
+
+/* ---- 随机源 ---- */
+function lrnd(n){var a=new Uint32Array(1),lim=Math.floor(4294967296/n)*n;do{crypto.getRandomValues(a)}while(a[0]>=lim);return a[0]%n}
+function local(n,min,max,repl){
+  var span=max-min+1,out=[];
+  if(repl){for(var i=0;i<n;i++)out.push(min+lrnd(span))}
+  else{var seen={};while(out.length<n){var x=min+lrnd(span);if(!seen[x]){seen[x]=1;out.push(x)}}}
+  return out;
+}
+async function rpc(method,params){
+  var ctl=new AbortController(),t=setTimeout(function(){ctl.abort()},9000);
+  try{
+    var r=await fetch("https://api.random.org/json-rpc/4/invoke",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({jsonrpc:"2.0",method:method,params:Object.assign({apiKey:cfg.key},params),id:1}),signal:ctl.signal});
+    var j=await r.json();
+    if(j.error)throw new Error(j.error.message||"接口错误");
+    return j.result;
+  }finally{clearTimeout(t)}
+}
+// 返回 n 个 [min,max] 整数；优先 random.org，失败自动回退本地
+async function ints(n,min,max,repl){
+  if(useTrue()&&n<=10000&&Math.abs(min)<=1e9&&Math.abs(max)<=1e9){
+    try{
+      var res=await rpc("generateIntegers",{n:n,min:min,max:max,replacement:repl});
+      src='<div class="src ok">✓ 真随机 · random.org</div>';
+      return res.random.data;
+    }catch(e){
+      var m=e&&e.name=="AbortError"?"请求超时":(e&&e.message||"网络错误");
+      if(/Failed to fetch|Load failed|NetworkError/i.test(m))m="网络或跨域被拦截";
+      src='<div class="src wn">⚠ 已改用本地随机（'+esc(m)+'）</div>';
+      return local(n,min,max,repl);
+    }
+  }
+  src='<div class="src">本地随机（浏览器加密级随机数）</div>';
+  return local(n,min,max,repl);
+}
+
+function addH(t,r){hist.unshift({t:t,r:r,at:new Date().toLocaleString("zh-CN",{hour12:false})});hist=hist.slice(0,50);sv("rt-hist",hist)}
+function setRes(h){$("#res").innerHTML=h+src}
+function err(m){$("#res").innerHTML='<div class="err">'+m+'</div>'}
+function num(id,d){var v=parseFloat($(id).value);return isNaN(v)?d:v}
+
+function nav(){
+  $("#nav").innerHTML=TABS.map(function(t){return '<button data-t="'+t[0]+'" class="'+(t[0]==cur?"on":"")+'">'+t[1]+'</button>'}).join("");
+  $("#nav").onclick=function(e){var t=e.target.getAttribute&&e.target.getAttribute("data-t");if(t){cur=t;render()}};
+  badge();
+}
+function render(){
+  nav();var v=$("#view"),h="";src="";
+  if(cur=="num")h='<div class="card"><div class="row"><div><label>最小值</label><input id="mn" type="number" value="1"></div><div><label>最大值</label><input id="mx" type="number" value="100"></div><div><label>数量</label><input id="ct" type="number" value="1" min="1"></div></div><label class="chk"><input id="nr" type="checkbox"> 不重复</label><button class="go" id="go">生成</button><div class="res" id="res"></div></div>';
+  if(cur=="list")h='<div class="card"><label>每行一项（可在末尾加 #数字 设置权重，默认 #1）</label><textarea id="ls">一等奖#1\n二等奖#3\n三等奖#6</textarea><div class="row"><div><label>结果数量</label><input id="ct" type="number" value="1" min="1"></div></div><label class="chk"><input id="nr" type="checkbox"> 不放回</label><button class="go" id="go">抽取</button><div class="res" id="res"></div></div>';
+  if(cur=="coin")h='<div class="card"><label>硬币数量</label><input id="ct" type="number" value="1" min="1" max="50"><button class="go" id="go">抛硬币</button><div class="res" id="res"></div></div>';
+  if(cur=="dice")h='<div class="card"><div class="row"><div><label>骰子数量</label><input id="ct" type="number" value="2" min="1" max="30"></div><div><label>面数</label><input id="sd" type="number" value="6" min="2" max="1000"></div></div><button class="go" id="go">掷骰</button><div class="res" id="res"></div></div>';
+  if(cur=="card")h='<div class="card"><label>抽牌数量</label><input id="ct" type="number" value="1" min="1" max="54"><label class="chk"><input id="jk" type="checkbox"> 包含大小王</label><label class="chk"><input id="nr" type="checkbox" checked> 不放回</label><button class="go" id="go">抽牌</button><div class="res" id="res"></div></div>';
+  if(cur=="hist")h='<div class="card">'+(hist.length?hist.map(function(x){return '<div class="hi"><span>'+esc(x.t)+'<br><small>'+esc(x.at)+'</small></span><span>'+esc(x.r)+'</span></div>'}).join("")+'<button class="go sec" id="clr">清空历史记录</button>':'<div class="res"><small>无历史记录</small></div>')+'</div>';
+  if(cur=="set")h='<div class="card"><label>random.org API key</label><input id="key" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="粘贴你的 key" value="'+esc(cfg.key)+'"><label class="chk"><input id="shw" type="checkbox"> 显示 key</label><label class="chk"><input id="on" type="checkbox"'+(cfg.on?" checked":"")+'> 使用真随机（random.org）</label><button class="go" id="sav">保存</button><button class="go sec" id="tst">测试连接</button><div class="res" id="res" style="min-height:30px;font-size:15px"></div><p class="note">key 只保存在这台设备的浏览器里，不会上传到别处。没填 key、关闭开关或请求失败时，会自动使用本地随机。</p></div>';
+  v.innerHTML=h;
+  if(cur=="hist"&&hist.length)$("#clr").onclick=function(){if(confirm("确定清空历史记录？")){hist=[];try{localStorage.removeItem("rt-hist")}catch(e){}render()}};
+  if(cur=="set"){
+    $("#shw").onchange=function(){$("#key").type=this.checked?"text":"password"};
+    $("#sav").onclick=function(){cfg={key:$("#key").value.trim(),on:$("#on").checked};sv("rt-cfg",cfg);badge();$("#res").innerHTML='<span class="src ok">已保存</span>'};
+    $("#tst").onclick=async function(){
+      cfg={key:$("#key").value.trim(),on:$("#on").checked};sv("rt-cfg",cfg);badge();
+      if(!cfg.key)return($("#res").innerHTML='<div class="err">请先填写 key</div>');
+      if(!cfg.on)return($("#res").innerHTML='<div class="err">请先勾选“使用真随机”</div>');
+      this.disabled=true;$("#res").innerHTML="<small>连接中…</small>";
+      await ints(1,1,6,true);$("#res").innerHTML=src;this.disabled=false;
+    };
+  }
+  if($("#go"))$("#go").onclick=async function(){if(busy)return;busy=true;var b=this;b.disabled=true;try{await run()}finally{busy=false;b.disabled=false}};
+}
+async function run(){
+  var ct=Math.max(1,Math.floor(num("#ct",1)));
+  if(cur=="num"){
+    var a=Math.floor(num("#mn",1)),b=Math.floor(num("#mx",100));
+    if(b<=a)return err("最大值应大于最小值");
+    var n=b-a+1,nr=$("#nr").checked;
+    if(nr&&ct>n)return err("无法生成 "+ct+" 个不重复整数");
+    ct=Math.min(ct,500);
+    var out=await ints(ct,a,b,!nr);
+    setRes(chips(out));addH("数字 "+a+"–"+b,out.join(", "));
+  }
+  if(cur=="list"){
+    var items=$("#ls").value.split("\n").map(function(s){return s.trim()}).filter(Boolean).map(function(s){
+      var m=s.match(/^(.*)#(\d+(?:\.\d+)?)$/);return m&&m[1].trim()?{n:m[1].trim(),w:parseFloat(m[2])}:{n:s,w:1}});
+    if(!items.length)return err("项目不能为空");
+    var nr2=$("#nr").checked;
+    if(nr2&&ct>items.length)return err("项目数量（"+items.length+"）不能小于结果数量（"+ct+"）");
+    ct=Math.min(ct,500);
+    var rs=await ints(ct,0,999999999,true),pool=items.slice(),o=[];
+    for(var k=0;k<ct;k++){
+      var tot=pool.reduce(function(s,x){return s+x.w},0),r=rs[k]/1e9*tot,j=0;
+      while(j<pool.length-1&&r>=pool[j].w){r-=pool[j].w;j++}
+      o.push(pool[j].n);if(nr2)pool.splice(j,1);
+    }
+    setRes(chips(o));addH("列表",o.join(", "));
+  }
+  if(cur=="coin"){
+    ct=Math.min(ct,50);var c=await ints(ct,0,1,true),h2=c.filter(function(f){return !f}).length;
+    setRes(c.map(function(f){return '<div class="coin">'+(f?"反":"正")+'</div>'}).join("")+(ct>1?'<div class="sum">正面 '+h2+' · 反面 '+(ct-h2)+'</div>':""));
+    addH("硬币 ×"+ct,c.map(function(f){return f?"反":"正"}).join(" "));
+  }
+  if(cur=="dice"){
+    ct=Math.min(ct,30);var sd=Math.max(2,Math.min(1000,Math.floor(num("#sd",6))));
+    var d=await ints(ct,1,sd,true),s=d.reduce(function(x,y){return x+y},0);
+    setRes(d.map(function(x){return '<div class="die">'+x+'</div>'}).join("")+'<div class="sum">共 '+s+' 点</div>');
+    addH(ct+"d"+sd,d.join(" + ")+" = "+s);
+  }
+  if(cur=="card"){
+    var S=[["♠","b"],["♥","r"],["♣","b"],["♦","r"]],R=["A","2","3","4","5","6","7","8","9","10","J","Q","K"],deck=[];
+    S.forEach(function(s){R.forEach(function(r){deck.push({t:r,s:s[0],c:s[1]})})});
+    if($("#jk").checked){deck.push({t:"小王",s:"",c:"b"});deck.push({t:"大王",s:"",c:"r"})}
+    var nr3=$("#nr").checked;ct=Math.min(ct,nr3?deck.length:54);
+    var idx=await ints(ct,0,deck.length-1,!nr3),dr=idx.map(function(i){return deck[i]});
+    setRes(dr.map(function(c){return '<div class="pc '+c.c+'"><span>'+c.s+'</span><span>'+c.t+'</span></div>'}).join(""));
+    addH("纸牌",dr.map(function(c){return c.s+c.t}).join(" "));
+  }
+}
+render();
+})();
+</script>
+</body>
+</html>
